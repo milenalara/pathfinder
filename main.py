@@ -77,3 +77,4 @@ else:
     print(caminho)
     print("Labirinto com caminho:")
     imprimir_matriz(mostrar_caminho(labirinto, caminho))
+    
