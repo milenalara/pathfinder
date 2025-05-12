@@ -1,75 +1,101 @@
 # Projeto Path Finder
 
-Aluna: Milena Lara Reis Ferreira
+Implementação do algoritmo A* para encontrar o menor caminho em um labirinto 2D.
 
 Este é um trabalho desenvolvido para a disciplina de Fundamentos de Projeto e Análise de Algoritmos, ministrada pelo professor João Paulo Aramuni em 2025/1 no bacharelado em Engenharia de Software da PUC Minas.
 
-Consiste na implementação  do algoritmo A * para encontrar o menor caminho em um labirinto 2D entre dois pontos, evitando obstáculos e considerando os custos dos
-movimentos.
+**Alunos:** 
+- Guilherme Leroy Teixeira Capanema
+- Milena Lara Reis Ferreira
 
 O arquivo main.py contém o código com a implementação e o arquivo tests.py contém alguns cenários de teste.
+## Visão Geral
 
-### Regras do Labirinto:
-1. O labirinto é representado por uma matriz 2D, onde:
-- 0: Células livres (onde o robô pode se mover).
-- 1: Obstáculos (onde o robô não pode passar).
-- S: Ponto inicial (start).
-- E: Ponto final (end).
+Este projeto consiste na implementação do algoritmo A* (A-estrela) para determinar o menor caminho entre um ponto inicial 'S' e um ponto final 'E' em um labirinto bidimensional. O algoritmo considera obstáculos e os custos dos movimentos (neste caso, custo uniforme para cada passo) para encontrar a rota ótima.
 
-Exemplo de labirinto:
-```
-S 0 1 0 0
-0 0 1 0 1
-0 1 0 0 0
-1 0 0 E 1
-```
+O código principal encontra-se no arquivo `main.py`, e `tests.py` contém cenários para validar a funcionalidade.
 
-2. O robô pode se mover para as células adjacentes (cima, baixo, esquerda e
-direita), desde que a célula não seja um obstáculo ou esteja fora dos limites do
-labirinto.
+## Regras do Labirinto
 
+1.  O labirinto é representado por uma matriz (lista de listas) 2D, onde cada célula pode ser:
+    * `0`: Célula livre, por onde o agente pode se mover.
+    * `1`: Obstáculo, intransponível pelo agente.
+    * `'S'`: Ponto inicial (Start).
+    * `'E'`: Ponto final (End).
 
-## Como rodar o projeto
-1. Clone o repositório do projeto `git clone git@github.com:milenalara/pathfinder.git`
-2. Abra o diretório no seu terminal de linha de comando e execute `python main.py` ou `python3 main.py` (à depender da versão do Python instalada na sua máquina).
+    **Exemplo de Labirinto:**
+    ```
+    S 0 1 0 0
+    0 0 1 0 1
+    0 1 0 0 0
+    1 0 0 E 1
+    ```
+
+2.  O agente pode se mover para células adjacentes nas quatro direções cardeais (cima, baixo, esquerda, direita), desde que a célula de destino não seja um obstáculo e esteja dentro dos limites do labirinto.
+
+## Como Rodar o Projeto
+
+1.  Clone o repositório do projeto:
+    ```bash
+    git clone git@github.com:milenalara/pathfinder.git
+    ```
+2.  Navegue até o diretório do projeto no seu terminal:
+    ```bash
+    cd pathfinder
+    ```
+3.  Execute o script principal:
+    ```bash
+    python main.py
+    ```
+    (ou `python3 main.py`, dependendo da configuração do seu sistema e versão do Python).
 
 ## Versão do Python
-Este projeto foi desenvolvido na versão 3.12.3 do Python.
 
-## Explicação das funções
+Este projeto foi desenvolvido e testado com Python 3.12.3.
 
-### heuristica(a, b)
-Calcula a distância de Manhattan entre dois pontos a e b.
-- Essa é a heurística usada pelo algoritmo A* para estimar a distância até o destino.
-- Fórmula: |x1 - x2| + |y1 - y2|
+## Detalhamento das Funções
 
-### encontrar_ponto(matriz, ponto)
-Percorre a matriz e retorna as coordenadas do ponto desejado (S ou E).
-- Serve para localizar onde o robô começa e onde ele precisa chegar.
+### `heuristica(a, b)`
 
-### vizinhos(pos, matriz)
-Retorna uma lista de coordenadas adjacentes válidas (cima, baixo, esquerda, direita) da posição atual.
-- Ignora posições com obstáculos (1) ou fora dos limites da matriz.
+Calcula a distância de Manhattan entre dois pontos `a` e `b` (tuplas `(linha, coluna)`).
+Esta função serve como a heurística $h(n)$ no algoritmo A*, estimando o custo do nó atual até o destino.
+A fórmula da distância de Manhattan é: $|x_1 - x_2| + |y_1 - y_2|$.
 
-### a_estrela(matriz)
-Implementa o algoritmo A*:
-- Usa uma fila de prioridade (heap) para explorar os caminhos.
-- Calcula f(n) = g(n) + h(n) para decidir o próximo passo.
-- Retorna o menor caminho do início ao fim como uma lista de coordenadas.
+### `encontrar_ponto(matriz, ponto)`
 
-### mostrar_caminho(matriz, caminho)
-Marca o caminho encontrado no labirinto com *, sem alterar S e E.
-- Cria uma cópia da matriz original com o trajeto visualmente destacado.
+Percorre a `matriz` para localizar e retornar as coordenadas `(linha, coluna)` do `ponto` especificado (seja 'S' para início ou 'E' para fim). Retorna `None` se o ponto não for encontrado.
 
-### imprimir_matriz(matriz)
-Imprime a matriz no console, organizando os elementos para fácil leitura.
-- Mostra o labirinto original ou o labirinto com o caminho final.
+### `vizinhos(pos, matriz)`
 
-## Exemplo de uso
+Dada uma posição atual `pos` `(linha, coluna)` e a `matriz` do labirinto, esta função retorna uma lista de todas as coordenadas adjacentes válidas (vizinhas).
+São consideradas válidas as células que:
+* Estão dentro dos limites da matriz.
+* Não são obstáculos (valor `1`).
+
+### `a_estrela(matriz)`
+
+Implementa o algoritmo A* para encontrar o menor caminho.
+1.  Localiza os pontos 'S' (início) e 'E' (fim) na `matriz`.
+2.  Utiliza uma fila de prioridade (implementada com `heapq`) para gerenciar os nós a serem explorados. A prioridade é determinada pelo custo $f(n)$.
+3.  Para cada nó, calcula-se $f(n) = g(n) + h(n)$, onde:
+    * $g(n)$: Custo real do caminho desde o nó inicial até o nó atual $n$.
+    * $h(n)$: Custo heurístico estimado do nó $n$ até o nó final (calculado por `heuristica`).
+4.  Mantém um conjunto de `visitados` para evitar reprocessamento de nós.
+5.  Retorna uma lista de tuplas `(linha, coluna)` representando as coordenadas do caminho encontrado, ou uma string indicando "Sem solução" ou erro.
+
+### `mostrar_caminho(matriz, caminho)`
+
+Gera uma nova representação da `matriz` do labirinto com o `caminho` encontrado marcado com asteriscos (`*`). Os pontos 'S' e 'E' são preservados.
+
+### `imprimir_matriz(matriz)`
+
+Imprime a `matriz` (labirinto) no console de forma legível, com cada célula separada por espaços.
+
+## Exemplo de Uso
 
 ### Entrada
 
-```
+```python
 labirinto = [
     ['S', 0, 1, 0, 0],
     [0, 0, 1, 0, 1],
@@ -78,7 +104,8 @@ labirinto = [
 ]
 ```
 
-### Saída
+### Saída Esperada no Console
+
 ```
 Caminho encontrado (coordenadas):
 [(0, 0), (0, 1), (1, 1), (2, 1), (3, 1), (3, 2), (3, 3)]
