@@ -29,24 +29,34 @@ def a_estrela(matriz):
     if not start or not end:
         return "Erro: Ponto inicial ou final ausente."
 
-    fila = [(0 + heuristica(start, end), 0, start, [start])]
+    fila = []
+    heapq.heappush(fila, (heuristica(start, end), 0, start, None))
+
+    came_from = {}
     visitados = set()
 
     while fila:
-        f, g, atual, caminho = heapq.heappop(fila)
+        f, g, atual, pai_do_atual_neste_caminho = heapq.heappop(fila)
 
         if atual in visitados:
             continue
         visitados.add(atual)
+        
+        came_from[atual] = pai_do_atual_neste_caminho
 
         if atual == end:
-            return caminho
+            caminho_final = []
+            curr = atual
+            while curr is not None:
+                caminho_final.append(curr)
+                curr = came_from.get(curr)
+            return caminho_final[::-1]
 
         for viz in vizinhos(atual, matriz):
             if viz not in visitados:
                 novo_g = g + 1
                 novo_f = novo_g + heuristica(viz, end)
-                heapq.heappush(fila, (novo_f, novo_g, viz, caminho + [viz]))
+                heapq.heappush(fila, (novo_f, novo_g, viz, atual))
 
     return "Sem solução"
 
@@ -61,7 +71,6 @@ def imprimir_matriz(matriz):
     for linha in matriz:
         print(' '.join(str(cell) for cell in linha))
 
-# Exemplo de uso
 labirinto = [
     ['S', 0, 1, 0, 0],
     [0, 0, 1, 0, 1],
@@ -77,4 +86,3 @@ else:
     print(caminho)
     print("Labirinto com caminho:")
     imprimir_matriz(mostrar_caminho(labirinto, caminho))
-    
